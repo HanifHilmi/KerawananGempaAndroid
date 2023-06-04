@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <color name="krb_sangatrendah">#d0def2</color>
+    <color name="krb_rendah">#aad590</color>
+    <color name="krb_sedang">#f9f290</color>
+    <color name="krb_tinggi">#ffa4bf</color>
 </resources>

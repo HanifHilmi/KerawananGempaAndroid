@@ -3,4 +3,8 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+
+<!--    <string name="api_key">AAPK6aaf3da59c354a9fbce50c5b4bcf77adu21eYG07ytwEhmwxrRKmW_ugKHZJFPLLqmqd9TsylgypJ7_KdgJ687b_2X20rOPu</string>-->
+    <string name="api_key">AAPK1ea8700a6a7f494597e61dbb57614a4e9GS6Vs50fB5fxBFNgemkUWNzbnoP107T_HfylVr8RPbrFsJaWE-3jXLg2XGVdJt_</string>
 </resources>

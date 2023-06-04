@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "214819891202",
+    "firebase_url": "https://gis-project-3aa15-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "gis-project-3aa15",
+    "storage_bucket": "gis-project-3aa15.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214819891202:android:d14e47cf645981a5509f1b",
+        "android_client_info": {
+          "package_name": "com.hilmihanif.earthquakeandtsunamihazardzones"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214819891202-v4t6jhhkg6jgpj1j0u0s8g59ople69n4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALMD55w87kEiJRa1l-VVSFF0nQtL_K4jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214819891202-b4ks1uqd4k6i4mds5g56avaobplplc3e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214819891202:android:08ffd530756c4683509f1b",
+        "android_client_info": {
+          "package_name": "com.hilmihanif.testarcgisapi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214819891202-v4t6jhhkg6jgpj1j0u0s8g59ople69n4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALMD55w87kEiJRa1l-VVSFF0nQtL_K4jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214819891202-b4ks1uqd4k6i4mds5g56avaobplplc3e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
