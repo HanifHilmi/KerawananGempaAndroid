@@ -5,12 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import com.arcgismaps.ApiKey
 import com.arcgismaps.ArcGISEnvironment
 import com.arcgismaps.Color
@@ -109,6 +107,7 @@ class DashboardFragment : Fragment() {
         //mapView.setViewpointAnimated(Viewpoint(3.028, 98.905, 10000000.0))
 
         mapView.setViewpointAnimated(Viewpoint(3.028, 98.905,10000000.0),1f,AnimationCurve.EaseInCirc)
+        mapView.onSingleTapConfirmed
         addPointGraphics()
         //map.maxExtent = batasMap
 
@@ -120,6 +119,8 @@ class DashboardFragment : Fragment() {
         val nwPoint = Point(93.699897,6.657766 , SpatialReference.wgs84())
 
         val simpleMarkerSymbol = SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Circle,Color.red)
+
+
 
         // create a blue outline symbol and assign it to the outline property of the simple marker symbol
         val blueOutlineSymbol = SimpleLineSymbol(SimpleLineSymbolStyle.Solid, Color.fromRgba(0, 0, 255), 2f)
