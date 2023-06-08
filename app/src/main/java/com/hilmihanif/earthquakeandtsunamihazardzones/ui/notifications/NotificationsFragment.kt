@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.arcgismaps.ApiKey
 import com.arcgismaps.ArcGISEnvironment
 import com.arcgismaps.Color
+import com.arcgismaps.arcade.ArcadeExpression
 
 import com.arcgismaps.data.ServiceFeatureTable
 import com.arcgismaps.geometry.GeometryEngine
@@ -27,6 +28,9 @@ import com.arcgismaps.mapping.layers.FeatureLayer
 import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
 import com.arcgismaps.mapping.symbology.SimpleFillSymbol
 import com.arcgismaps.mapping.symbology.SimpleFillSymbolStyle
+import com.arcgismaps.mapping.symbology.SimpleLineSymbol
+import com.arcgismaps.mapping.symbology.SimpleLineSymbolStyle
+import com.arcgismaps.mapping.symbology.SimpleRenderer
 import com.arcgismaps.mapping.symbology.UniqueValue
 import com.arcgismaps.mapping.symbology.UniqueValueRenderer
 import com.arcgismaps.mapping.view.Graphic
@@ -34,6 +38,8 @@ import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.MapView
 import com.hilmihanif.earthquakeandtsunamihazardzones.R
 import com.hilmihanif.earthquakeandtsunamihazardzones.databinding.FragmentNotificationsBinding
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class NotificationsFragment : Fragment() {
@@ -72,11 +78,17 @@ class NotificationsFragment : Fragment() {
         setApiKey()
 
 
-        val map = ArcGISMap(BasemapStyle.ArcGISImageryStandard)
-
+        val baseMap = ArcGISMap(BasemapStyle.ArcGISImageryStandard)
+        mMapView.map = baseMap
         mGraphicsOverlay = GraphicsOverlay()
         mMapView.graphicsOverlays.add(mGraphicsOverlay)
-        addLayer(map)
+
+        addFaultModelLayer(baseMap)
+        addKerawananLayer(baseMap)
+
+        setTapPinLocation()
+
+        mMapView.setViewpoint(Viewpoint(3.028, 98.905,10000000.0))
 
 
 
@@ -90,7 +102,7 @@ class NotificationsFragment : Fragment() {
 
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun addLayer(map :ArcGISMap){
+    private fun addKerawananLayer(baseMap :ArcGISMap){
 
 
 
@@ -119,15 +131,31 @@ class NotificationsFragment : Fragment() {
 
         val renderer = UniqueValueRenderer(fieldNames,uniqueValueList)
         sumutGempaLayer.renderer = renderer
-        sumutGempaLayer.opacity = 0.2f
+        sumutGempaLayer.opacity = 0.5f
 
 
 
-        map.operationalLayers.add(sumutGempaLayer)
+        baseMap.operationalLayers.add(sumutGempaLayer)
 //        mMapView.setViewpointAnimated(Viewpoint(3.028, 98.905,10000000.0),1f, AnimationCurve.EaseInCirc)
-        mMapView.map = map
-        mMapView.setViewpoint(Viewpoint(3.028, 98.905,10000000.0))
 
+
+
+
+    }
+
+    private fun addFaultModelLayer(baseMap:ArcGISMap){
+        val faultModelLayer = FeatureLayer.createWithFeatureTable(ServiceFeatureTable("https://services7.arcgis.com/5U3WUC2hg7PzozWK/arcgis/rest/services/patahan_tektonik_fixed/FeatureServer/0"))
+
+        val lineSymbol = SimpleLineSymbol(SimpleLineSymbolStyle.Solid,Color(ContextCompat.getColor(requireContext(),R.color.orange)),2.0f)
+
+        val renderer = SimpleRenderer(lineSymbol)
+        faultModelLayer.renderer = renderer
+        faultModelLayer.opacity = 0.75f
+
+        baseMap.operationalLayers.add(faultModelLayer)
+    }
+
+    private fun setTapPinLocation(){
         lifecycleScope.launch {
             mMapView.onSingleTapConfirmed.collect{
                 val wgs84Point = GeometryEngine.projectOrNull(it.mapPoint!!, SpatialReference.wgs84())
@@ -136,7 +164,7 @@ class NotificationsFragment : Fragment() {
                 val pinLocation = BitmapFactory.decodeResource(resources,R.drawable.placeholder).toDrawable(resources)
                 mGraphicsOverlay.graphics.let{graphicList ->
                     val pinLocationSymbol = PictureMarkerSymbol.createWithImage(pinLocation)
-                    val pinSize = 60f
+                    val pinSize = 50f
                     if (graphicList.isNotEmpty()) graphicList.removeLast()
 
                     pinLocationSymbol.height = pinSize
@@ -144,15 +172,12 @@ class NotificationsFragment : Fragment() {
                     pinLocationSymbol.offsetY = pinSize/2
                     val pinLocationGraphic = Graphic(wgs84Point,pinLocationSymbol)
                     graphicList.add(pinLocationGraphic)
+
                 }
 
             }
 
-
         }
-
-
-
 
     }
 
