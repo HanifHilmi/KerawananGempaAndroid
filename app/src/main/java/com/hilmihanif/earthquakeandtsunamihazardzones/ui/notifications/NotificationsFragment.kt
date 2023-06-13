@@ -44,6 +44,8 @@ import com.arcgismaps.mapping.view.Graphic
 import com.arcgismaps.mapping.view.GraphicsOverlay
 import com.arcgismaps.mapping.view.IdentifyLayerResult
 import com.arcgismaps.mapping.view.MapView
+import com.arcgismaps.tasks.geocode.LocatorTask
+import com.arcgismaps.tasks.geocode.ReverseGeocodeParameters
 import com.hilmihanif.earthquakeandtsunamihazardzones.R
 import com.hilmihanif.earthquakeandtsunamihazardzones.databinding.FragmentNotificationsBinding
 import kotlinx.coroutines.cancel
@@ -51,6 +53,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class NotificationsFragment : Fragment() {
+
+    companion object {
+        val TEST_LOG = "Test Identifier"
+    }
 
     private var _binding: FragmentNotificationsBinding? = null
 
@@ -84,19 +90,14 @@ class NotificationsFragment : Fragment() {
         lifecycle.addObserver(mMapView)
         setApiKey()
 
-
         val baseMap = ArcGISMap(BasemapStyle.ArcGISImageryStandard)
         mMapView.map = baseMap
         mGraphicsOverlay = GraphicsOverlay()
         mMapView.graphicsOverlays.add(mGraphicsOverlay)
 
+        mMapView.setViewpoint(Viewpoint(3.028, 98.905, 10000000.0))
         addFaultModelLayer(baseMap)
         addKerawananLayer(baseMap)
-
-
-
-        mMapView.setViewpoint(Viewpoint(3.028, 98.905, 10000000.0))
-
 
         return root
     }
@@ -189,6 +190,11 @@ class NotificationsFragment : Fragment() {
 
                 val pinLocation = BitmapFactory.decodeResource(resources, R.drawable.placeholder)
                     .toDrawable(resources)
+
+                val reverseGeocodeMapResult = reverseGeocodingOrNull(it.mapPoint)
+
+
+
                 mGraphicsOverlay.graphics.let { graphicList ->
                     val pinLocationSymbol = PictureMarkerSymbol.createWithImage(pinLocation)
                     val pinSize = 50f
@@ -202,21 +208,30 @@ class NotificationsFragment : Fragment() {
 
 
                     // identify layer value
-                    val identifyLayerResultFuture = mMapView.identifyLayer(layer,mMapView.locationToScreen(it.mapPoint!!),10.0,false,1)
-                    val identifyLayerResult :IdentifyLayerResult = identifyLayerResultFuture.getOrNull()!!
+                    val identifyLayerResultFuture = mMapView.identifyLayer(
+                        layer,
+                        mMapView.locationToScreen(it.mapPoint!!),
+                        10.0,
+                        false,
+                        1
+                    )
+                    val identifyLayerResult: IdentifyLayerResult =
+                        identifyLayerResultFuture.getOrNull()!!
                     val geoElementList = identifyLayerResult.geoElements
 
 
                     var kerawanan = ""
-                    Log.d("TestIdentifier",geoElementList.toString())
-                    for (element in geoElementList){
-                        if (element is ArcGISFeature){
-                            Log.d("TestIdentifier",element.attributes.toString())
+                    Log.d("TestIdentifier", geoElementList.toString())
+                    Log.d("TestIdentifier", " LongLat :${wgs84Point?.x},${wgs84Point?.y}")
+                    for (element in geoElementList) {
+                        if (element is ArcGISFeature) {
+                            Log.d("TestIdentifier", element.attributes.toString())
                             kerawanan = element.attributes.getValue("Kerawanan").toString()
-                        }else{
-                            Log.d("TestIdentifier","bukan raster")
+                        } else {
+                            Log.d("TestIdentifier", "bukan raster")
                         }
                     }
+
 
 
                     Toast.makeText(
@@ -225,20 +240,8 @@ class NotificationsFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
 
-
-
-
-
                 }
 
-
-//                val searchGeometry =GeometryEngine.bufferOrNull(it.mapPoint!!,1000.0)
-//
-//                val queryParams = QueryParameters()
-//                queryParams.geometry = searchGeometry
-//                queryParams.spatialRelationship = SpatialRelationship.Contains
-//
-//                val selectFeature = baseMap.operationalLayers.last()
 
             }
 
@@ -246,13 +249,31 @@ class NotificationsFragment : Fragment() {
 
     }
 
-    private fun identifyLayer(mapPoint: Point,layer: FeatureLayer){
-
+    private fun reverseGeocodingOrNull(mapPoint: Point?): Map<String,Any>?{
+        var mapList : Map<String,Any>? = null
         viewLifecycleOwner.lifecycleScope.launch {
+            val locatorTask =
+                LocatorTask("https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer").apply {
+                    apiKey = ApiKey.create(getString(R.string.api_key))
+                }
 
+            val geocodeList =
+                locatorTask.reverseGeocode(mapPoint!!, ReverseGeocodeParameters().apply {
+                    outputSpatialReference = mMapView.spatialReference.value
+                }).getOrNull()
 
+            if (geocodeList!!.isNotEmpty()) {
+                val geocode = geocodeList[0]
+                Log.d(TEST_LOG, "geocode atrributes : ${geocode.attributes.toString()}")
+                mMapView.setViewpointCenter(geocode.displayLocation!!)
+                mapList =  geocode.attributes
+            } else {
+                Log.d(TEST_LOG, "geocode atrributes empty")
+            }
         }
+        return mapList
     }
+
 
     private fun setApiKey() {
         ArcGISEnvironment.apiKey = ApiKey.create(getString(R.string.api_key))
