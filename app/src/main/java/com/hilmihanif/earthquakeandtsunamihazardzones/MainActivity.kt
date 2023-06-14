@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
 
         navView.setupWithNavController(navController)
-        navView.selectedItemId = R.id.navigation_notifications
+        navView.selectedItemId = R.id.navigation_kerawanan
 
     }
 }

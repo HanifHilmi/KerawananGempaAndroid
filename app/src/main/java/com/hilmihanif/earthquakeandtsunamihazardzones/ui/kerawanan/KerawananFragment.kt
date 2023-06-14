@@ -1,4 +1,4 @@
-package com.hilmihanif.earthquakeandtsunamihazardzones.ui.notifications
+package com.hilmihanif.earthquakeandtsunamihazardzones.ui.kerawanan
 
 
 import android.annotation.SuppressLint
@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -18,12 +17,10 @@ import androidx.lifecycle.lifecycleScope
 import com.arcgismaps.ApiKey
 import com.arcgismaps.ArcGISEnvironment
 import com.arcgismaps.Color
-import com.arcgismaps.arcade.ArcadeExpression
 import com.arcgismaps.data.ArcGISFeature
-import com.arcgismaps.data.QueryParameters
 
 import com.arcgismaps.data.ServiceFeatureTable
-import com.arcgismaps.data.SpatialRelationship
+import com.arcgismaps.geometry.Envelope
 import com.arcgismaps.geometry.GeometryEngine
 import com.arcgismaps.geometry.Point
 import com.arcgismaps.geometry.SpatialReference
@@ -31,7 +28,6 @@ import com.arcgismaps.mapping.ArcGISMap
 import com.arcgismaps.mapping.BasemapStyle
 import com.arcgismaps.mapping.Viewpoint
 import com.arcgismaps.mapping.layers.FeatureLayer
-import com.arcgismaps.mapping.layers.RasterCell
 import com.arcgismaps.mapping.symbology.PictureMarkerSymbol
 import com.arcgismaps.mapping.symbology.SimpleFillSymbol
 import com.arcgismaps.mapping.symbology.SimpleFillSymbolStyle
@@ -47,18 +43,16 @@ import com.arcgismaps.mapping.view.MapView
 import com.arcgismaps.tasks.geocode.LocatorTask
 import com.arcgismaps.tasks.geocode.ReverseGeocodeParameters
 import com.hilmihanif.earthquakeandtsunamihazardzones.R
-import com.hilmihanif.earthquakeandtsunamihazardzones.databinding.FragmentNotificationsBinding
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.isActive
+import com.hilmihanif.earthquakeandtsunamihazardzones.databinding.FragmentKerawananBinding
 import kotlinx.coroutines.launch
 
-class NotificationsFragment : Fragment() {
+class KerawananFragment : Fragment() {
 
     companion object {
         val TEST_LOG = "Test Identifier"
     }
 
-    private var _binding: FragmentNotificationsBinding? = null
+    private var _binding: FragmentKerawananBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -76,26 +70,29 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(NotificationsViewModel::class.java)
+        val kerawananViewModel =
+            ViewModelProvider(this).get(KerawananViewModel::class.java)
 
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        _binding = FragmentKerawananBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
 //        val textView: TextView = binding.textNotifications
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
+        kerawananViewModel.text.observe(viewLifecycleOwner) {
 //            textView.text = it
         }
 
         lifecycle.addObserver(mMapView)
         setApiKey()
 
-        val baseMap = ArcGISMap(BasemapStyle.ArcGISImageryStandard)
+        val baseMap = ArcGISMap(BasemapStyle.ArcGISImageryStandard).apply {
+            maxExtent = Envelope(91.404757,-8.65,109.586,7.956929, spatialReference = SpatialReference.wgs84())
+        }
         mMapView.map = baseMap
         mGraphicsOverlay = GraphicsOverlay()
         mMapView.graphicsOverlays.add(mGraphicsOverlay)
 
         mMapView.setViewpoint(Viewpoint(3.028, 98.905, 10000000.0))
+
         addFaultModelLayer(baseMap)
         addKerawananLayer(baseMap)
 
